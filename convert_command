@@ -1,0 +1,1 @@
+convert old.jpg -colorspace Gray -gravity center -crop 5:3 -resize 800x480 new.jpg
