@@ -1,40 +1,64 @@
 #!/usr/bin/python
-# -*- coding:utf-8 -*-
-import sys
 import os
-# picdir = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'pic')
-# libdir = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'lib')
-# if os.path.exists(libdir):
-#     sys.path.append(libdir)
-
 import logging
 import epd7in5_V2
-import time
-from PIL import Image,ImageDraw,ImageFont
-import traceback
+from PIL import Image
 
-logging.basicConfig(level=logging.DEBUG)
+PREV_PICTURE_FILE = "previous_picutre"
+PIC_DIR = "images/"
 
-try:
-    logging.info("epd7in5_V2 Demo")
-    epd = epd7in5_V2.EPD()
+def main():
+    logging.basicConfig(level=logging.DEBUG, filename="pictureframe.log")
+
+    try:
+        prev_file = ""
+        with open(PREV_PICTURE_FILE) as prev:
+            prev_file = prev.readline()
+    except IOError as e:
+        logging.error(e)
+        show_error_on_display(e)
+
+    all_photos = [f for f in os.listdir(PIC_DIR) if os.path.isfile(os.path.join(PIC_DIR, f))]
+    index = 0
+    if prev_file in all_photos and (index := all_photos.index(prev_file)) != len(all_photos) - 1:
+        index += 1
+
+    show_image_on_display(os.path.join(PIC_DIR, all_photos[index]))
+    try:
+        with open(PREV_PICTURE_FILE, "w") as f:
+            f.write(all_photos[index])
+    except IOError as e:
+        logging.error(e)
+        show_error_on_display(e)
     
-    logging.info("init and Clear")
-    epd.init()
-    epd.Clear()
+    # os.system("sudo poweroff")
 
 
-    logging.info("read bmp file")
-    Himage = Image.open("norway.jpg")
-    epd.display(epd.getbuffer(Himage))
+def show_image_on_display(photo_path: str):
+    try:
+        logging.info("epd7in5_V2 Demo")
+        epd = epd7in5_V2.EPD()
 
-    logging.info("Goto Sleep...")
-    epd.sleep()
-    
-except IOError as e:
-    logging.info(e)
-    
-except KeyboardInterrupt:    
-    logging.info("ctrl + c:")
-    epd7in5_V2.epdconfig.module_exit(cleanup=True)
-    exit()
+        logging.info("init and Clear")
+        epd.init()
+        epd.Clear()
+
+
+        logging.info("read bmp file")
+        Himage = Image.open(photo_path)
+        epd.display(epd.getbuffer(Himage))
+
+        logging.info("Goto Sleep...")
+        epd.sleep()
+
+    except IOError as e:
+        logging.info(e)
+
+
+def show_error_on_display(e: IOError) -> None:
+    # TODO
+    pass
+
+
+if __name__ == "__main__":
+    main()
