@@ -7,7 +7,7 @@ from PIL import Image
 PREV_PICTURE_FILE = "previous_picutre"
 PIC_DIR = "images/"
 
-def main():
+def main() -> None:
     logging.basicConfig(level=logging.DEBUG, filename="pictureframe.log")
 
     try:
@@ -30,11 +30,9 @@ def main():
     except IOError as e:
         logging.error(e)
         show_error_on_display(e)
-    
-    # os.system("sudo poweroff")
 
 
-def show_image_on_display(photo_path: str):
+def show_image_on_display(photo_path: str) -> None:
     try:
         logging.info("epd7in5_V2 Demo")
         epd = epd7in5_V2.EPD()
@@ -42,7 +40,6 @@ def show_image_on_display(photo_path: str):
         logging.info("init and Clear")
         epd.init()
         epd.Clear()
-
 
         logging.info("read bmp file")
         Himage = Image.open(photo_path)
@@ -53,6 +50,7 @@ def show_image_on_display(photo_path: str):
 
     except IOError as e:
         logging.info(e)
+        show_error_on_display(e)
 
 
 def show_error_on_display(e: IOError) -> None:
