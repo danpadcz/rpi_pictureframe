@@ -15,7 +15,9 @@ PIC_DIR = "images/"
 
 def main() -> None:
     logging.basicConfig(level=logging.DEBUG, filename="pictureframe.log")
-    if " -s" not in " ".join(sys.argv):
+    if len(sys.argv) > 3 and "-m" in sys.argv[-2]:
+      show_image_on_display(sys.argv[-1])
+    elif " -s" not in " ".join(sys.argv):
         random_selection()
     else:
         sequential_selection()
