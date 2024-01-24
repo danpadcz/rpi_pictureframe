@@ -1,15 +1,49 @@
 #!/usr/bin/python
 import os
 import logging
+import random
+import sys
+from typing import List
+
 import epd7in5_V2
 from PIL import Image
+import argparse
 
 PREV_PICTURE_FILE = "previous_picutre"
+RANDOM_LIST = "random_selection"
 PIC_DIR = "images/"
 
 def main() -> None:
     logging.basicConfig(level=logging.DEBUG, filename="pictureframe.log")
+    if " -s" not in " ".join(sys.argv):
+        random_selection()
+    else:
+        sequential_selection()
 
+def random_selection() -> None:
+    to_select: List[str] = []
+    try:
+        with open(RANDOM_LIST) as f:
+            to_select = f.readlines()
+    except IOError as e:
+        logging.error(e)
+        show_error_on_display(e)
+
+    if not to_select:
+        to_select = [f+"\n" for f in os.listdir(PIC_DIR) if os.path.isfile(os.path.join(PIC_DIR, f))]
+
+    selected = random.choice(to_select)
+    show_image_on_display(os.path.join(PIC_DIR, selected.strip()))
+    to_select.remove(selected)
+
+    try:
+        with open(RANDOM_LIST, "w") as f:
+            f.writelines(to_select)
+    except IOError as e:
+        logging.error(e)
+        show_error_on_display(e)
+
+def sequential_selection() -> None:
     try:
         prev_file = ""
         with open(PREV_PICTURE_FILE) as prev:
