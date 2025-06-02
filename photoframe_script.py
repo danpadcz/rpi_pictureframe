@@ -30,9 +30,13 @@ def main() -> None:
                 random_selection()
                 return
             show_image_on_display(filename)
+        return
+
     if args.photo is not None:
       show_image_on_display(args.photo)
-    elif not args.sequential:
+      return
+
+    if not args.sequential:
         random_selection()
     else:
         sequential_selection()
