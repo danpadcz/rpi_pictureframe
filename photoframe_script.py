@@ -12,12 +12,27 @@ import argparse
 PREV_PICTURE_FILE = "previous_picutre"
 RANDOM_LIST = "random_selection"
 PIC_DIR = "images/"
+CURRENT_PHOTO_FILE = "current_photo.txt"
 
 def main() -> None:
     logging.basicConfig(level=logging.DEBUG, filename="pictureframe.log")
-    if len(sys.argv) > 3 and "-m" in sys.argv[-2]:
-      show_image_on_display(sys.argv[-1])
-    elif " -s" not in " ".join(sys.argv):
+    parser = argparse.ArgumentParser(prog="Photoframe script")
+    parser.add_argument('-p', '--photo', action='store')
+    parser.add_argument('-s', '--sequential', action='store_true')
+    parser.add_argument('--last-photo', action='store_true')
+    args = parser.parse_args()
+
+    if args.last_photo:
+        with open(CURRENT_PHOTO_FILE) as f:
+            filename = f.read().strip()
+            if filename == "":
+                logging.error("Last photo couldn't be opened, loaded string was empty.")
+                random_selection()
+                return
+            show_image_on_display(filename)
+    if args.photo != "":
+      show_image_on_display(args.photo)
+    elif not args.sequential:
         random_selection()
     else:
         sequential_selection()
@@ -85,7 +100,7 @@ def show_image_on_display(photo_path: str) -> None:
         epd.sleep()
 
         logging.info("writing filename")
-        with open("current_photo.txt", "w") as f:
+        with open(CURRENT_PHOTO_FILE, "w") as f:
             f.write(photo_path)
 
     except IOError as e:
