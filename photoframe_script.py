@@ -84,6 +84,10 @@ def show_image_on_display(photo_path: str) -> None:
         logging.info("Goto Sleep...")
         epd.sleep()
 
+        logging.info("writing filename")
+        with open("current_photo.txt", "w") as f:
+            f.write(photo_path)
+
     except IOError as e:
         logging.info(e)
         show_error_on_display(e)
