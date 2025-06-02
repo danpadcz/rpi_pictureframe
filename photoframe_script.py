@@ -24,7 +24,7 @@ def main() -> None:
 
     if args.last_photo:
         with open(CURRENT_PHOTO_FILE) as f:
-            filename = f.read().strip()
+            filename = f.readline().strip()
             if filename == "":
                 logging.error("Last photo couldn't be opened, loaded string was empty.")
                 random_selection()
